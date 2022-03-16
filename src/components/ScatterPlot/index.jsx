@@ -5,9 +5,9 @@ import _ from "lodash";
 import { CHART_DIMENSIONS } from "pages/Visualizer/constants";
 import { useGetScales } from "hooks/useGetScales";
 
-const BarChartC = () => {
-  const { xScale, yScale, colorScale } = useGetScales();
-  console.log("------ render BarChartC");
+const ScatterPlotC = () => {
+  const { xScale, yScale, colorScale } = useGetScales({ isScatterPlot: true });
+  console.log("------ render ScatterPlotC");
 
   const dataset = useSelector((state) => state.dataset.original);
 
@@ -42,13 +42,10 @@ const BarChartC = () => {
           const fill = colorScale(xVal.toString());
 
           return (
-            <rect
-              x={xScale(xVal.toString())}
-              y={yScale(yVal.toString())}
-              width={xScale.bandwidth ? xScale.bandwidth() : 10}
-              height={
-                yScale.bandwidth ? yScale.bandwidth() : height - yScale(yVal)
-              }
+            <circle
+              cx={xScale(xVal.toString())}
+              cy={yScale(yVal)}
+              r="5"
               style={{ opacity: 0.8 }}
               fill={fill}
               stroke="black"
@@ -61,4 +58,4 @@ const BarChartC = () => {
   );
 };
 
-export const BarChart = memo(BarChartC);
+export const ScatterPlot = memo(ScatterPlotC);

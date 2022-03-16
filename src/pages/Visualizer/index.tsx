@@ -4,24 +4,13 @@ import { useRetrieveDataset } from "hooks/useRetrieveDataset";
 import { BasicTable } from "components/Table";
 import { useSelector } from "react-redux";
 import { RootState } from "store";
-import { BarChartSection } from "./components/BarChartSection";
-import { ScatterPlotChartSection } from "./components/ScatterPlotChartSection";
-
-const dimensions = {
-  width: 900,
-  height: 700,
-  margin: {
-    top: 50,
-    bottom: 20,
-    left: 50,
-    right: 20,
-  },
-};
+import { LayoutChartSection } from "./components/Layout";
+import { BarChart } from "components/BarChart";
+import { ScatterPlot } from "components/ScatterPlot";
+import { ScalesSelector } from "./components/MultipleSelect";
 
 export const VisualizerPage: FC = () => {
-  useRetrieveDataset();
-
-  const dataset = useSelector((state: RootState) => state.dataset.original);
+  const dataset = useRetrieveDataset();
   const tableHeadValues = useSelector(
     (state: RootState) => state.dataset.csvKeys
   );
@@ -44,9 +33,14 @@ export const VisualizerPage: FC = () => {
     >
       {dataset.length > 0 && (
         <>
-          <BasicTable dataset={dataset} tableHeadValues={tableHeadValues} />
-          <BarChartSection />
-          <ScatterPlotChartSection />
+          <BasicTable tableHeadValues={tableHeadValues} />
+          <ScalesSelector />
+          <LayoutChartSection>
+            <BarChart />
+          </LayoutChartSection>
+          <LayoutChartSection>
+            <ScatterPlot />
+          </LayoutChartSection>
         </>
       )}
     </motion.div>

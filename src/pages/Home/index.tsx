@@ -19,8 +19,6 @@ export const Home = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  useRetrieveDataset();
-
   const onUploadFinished = () => navigate(routes.visualizer);
 
   const handleFileSelected = (e: React.ChangeEvent<HTMLInputElement>): void => {

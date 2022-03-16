@@ -10,13 +10,15 @@ import TablePagination from "@mui/material/TablePagination";
 import { useSelector } from "react-redux";
 import { RootState } from "store";
 import { StyledTableCell, StyledTableRow } from "./styles";
+import { useRetrieveDataset } from "hooks/useRetrieveDataset";
 
 interface Props {
-  dataset: unknown[];
   tableHeadValues: string[];
 }
 
-export const BasicTable = ({ dataset, tableHeadValues }: Props) => {
+export const BasicTable = ({ tableHeadValues }: Props) => {
+  const dataset = useRetrieveDataset();
+
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
 

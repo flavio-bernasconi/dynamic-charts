@@ -4,8 +4,15 @@ import _ from "lodash";
 import { formatDataset, getUniqueDataset } from "utils/dataset";
 import chroma from "chroma-js";
 import { useSelector } from "react-redux";
+import { CHART_DIMENSIONS } from "pages/Visualizer/constants";
 
-export const useGetScales = ({ width, height }) => {
+export const useGetScales = (props = {}) => {
+  console.log({ props });
+  const { isScatterPlot } = props;
+
+  const width = CHART_DIMENSIONS.width;
+  const height = CHART_DIMENSIONS.height;
+
   // "sepal.length","sepal.width","petal.length","petal.width","variety"
   const dataset = useSelector((state) => state.dataset.original);
 
@@ -16,8 +23,13 @@ export const useGetScales = ({ width, height }) => {
   const xDataset = useMemo(() => formatDataset({ dataset, key: xScaleKey }), [
     xScaleKey,
   ]);
-  const yDataset = formatDataset({ dataset, key: yScaleKey });
-  const colorDataset = formatDataset({ dataset, key: colorScaleKey });
+  const yDataset = useMemo(() => formatDataset({ dataset, key: yScaleKey }), [
+    yScaleKey,
+  ]);
+  const colorDataset = useMemo(
+    () => formatDataset({ dataset, key: colorScaleKey }),
+    [colorScaleKey]
+  );
 
   const uniqueColorDataset = getUniqueDataset(colorDataset);
 
@@ -52,6 +64,25 @@ export const useGetScales = ({ width, height }) => {
     [xDataset]
   );
 
+  const xScalePoint = useMemo(
+    () =>
+      d3
+        .scaleBand()
+        .domain(getUniqueDataset(xDataset))
+        .range([0, width])
+        .padding(0.5),
+    [xDataset]
+  );
+
+  const xScaleByType = {
+    number: xScale,
+    string: isScatterPlot ? xScalePoint : xScaleBand,
+  };
+
+  const xScaleToUse = useMemo(() => xScaleByType[typeof xDataset[0]], [
+    xDataset,
+  ]);
+
   const yScale = useMemo(
     () =>
       d3
@@ -70,28 +101,30 @@ export const useGetScales = ({ width, height }) => {
         .range([0, height])
         .paddingOuter(0.25)
         .paddingInner(0.5),
-    [xDataset]
+    [yDataset]
   );
 
-  const xScaleByType = {
-    number: xScale,
-    string: xScaleBand,
-  };
-
-  const xScaleToUse = useMemo(() => xScaleByType[typeof xDataset[0]], [
-    xDataset,
-  ]);
+  const yScalePoint = useMemo(
+    () =>
+      d3
+        .scalePoint()
+        .domain(getUniqueDataset(yDataset))
+        .range([0, height])
+        .padding(0.5),
+    [yDataset]
+  );
 
   const yScaleByType = {
     number: yScale,
-    string: yScaleBand,
+    string: isScatterPlot ? yScalePoint : yScaleBand,
   };
 
   const yScaleToUse = useMemo(() => yScaleByType[typeof yDataset[0]], [
     yDataset,
   ]);
 
-  if (!xScaleKey || !yScaleKey) return { isLoading: true };
+  if (!xScaleKey || !yScaleKey || !xScaleToUse || !yScaleToUse || !colorScale)
+    return { isLoading: true };
 
   return {
     xScale: xScaleToUse,

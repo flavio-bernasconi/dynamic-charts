@@ -1,39 +1,54 @@
-import React from "react";
+import React, { FC } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "store";
-import { SelectInput } from "components/Select";
-import { Grid, SelectChangeEvent } from "@mui/material";
-import { OptionsListConfigInterface } from "../BarChartSection";
+import {
+  setXScaleKey,
+  setYScaleKey,
+  setColorScaleKey,
+} from "store/datasetStore";
+import { MultipleSelects } from "components/MultipleSelect";
 
-export const MultipleSelects = ({
-  optionListConfig,
-  optionsList,
-}: {
-  optionListConfig: OptionsListConfigInterface[];
-  optionsList: string[];
-}) => {
-  const handleInputChange = (
-    e: SelectChangeEvent<number | string>,
-    keySetter: Function
-  ) => {
-    const values = e.target.value;
-    keySetter(values.toString());
-  };
+export interface OptionsListConfigInterface {
+  setter: Function;
+  label: string;
+  value: string | undefined;
+}
+
+export const ScalesSelector = () => {
+  const dispatch = useDispatch();
+
+  const xScaleKey = useSelector((state: RootState) => state.dataset.xScaleKey);
+  const yScaleKey = useSelector((state: RootState) => state.dataset.yScaleKey);
+  const colorScaleKey = useSelector(
+    (state: RootState) => state.dataset.colorScaleKey
+  );
+
+  const optionListConfig: OptionsListConfigInterface[] = [
+    {
+      setter: (value: string) => dispatch(setXScaleKey(value)),
+      label: "xxxx",
+      value: xScaleKey,
+    },
+    {
+      setter: (value: string) => dispatch(setYScaleKey(value)),
+      label: "yyyy",
+      value: yScaleKey,
+    },
+    {
+      setter: (value: string) => dispatch(setColorScaleKey(value)),
+      label: "color",
+      value: colorScaleKey,
+    },
+  ];
+
+  const tableHeadValues = useSelector(
+    (state: RootState) => state.dataset.csvKeys
+  );
 
   return (
-    <div style={{ margin: 30 }}>
-      <Grid container spacing={2}>
-        {optionListConfig.map(({ setter, label, value }, i) => (
-          <Grid item xs={6} md={4} key={`${label}_${value}_${i}`}>
-            <SelectInput
-              optionsList={optionsList}
-              handleChange={(e) => handleInputChange(e, setter)}
-              label={label}
-              currentValue={value}
-            />
-          </Grid>
-        ))}
-      </Grid>
-    </div>
+    <MultipleSelects
+      optionsList={tableHeadValues}
+      optionListConfig={optionListConfig}
+    />
   );
 };

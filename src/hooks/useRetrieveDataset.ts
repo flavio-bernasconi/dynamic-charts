@@ -21,5 +21,5 @@ export const useRetrieveDataset = () => {
     dispatch(setCsvKeys(Object.keys(parseRetrievedDataset[0])));
   }, [dataset, parseRetrievedDataset]);
 
-  return null;
+  return dataset || {};
 };
